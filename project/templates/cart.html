@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Просто магазин / Корзина{% endblock %}
+
+{% block main %}
+
+
+<div class="container mt-3">
+
+  <div class="row">
+    <div class="col-lg-6 col-md-9 col-sm-12 order-md-2 mb-4">
+      <h4 class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-muted">Ваша корзина</span>
+        <span class="badge badge-secondary badge-pill">
+          {% if items_in_cart %}
+          {{ items_in_cart }}
+          {% else %}
+          0
+          {% endif %}
+        </span>
+      </h4>
+
+    {% if cart %}
+      <ul class="list-group mb-3">
+        {% for product, quantity in cart.items %}
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+          <div>
+            <h6 class="my-0">{{ product.title }}</h6>
+            <small class="text-muted">{{ product.description }}</small>
+          </div>
+          <span class="text-muted">{{ quantity }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% if user.is_authenticated %}
+      <form class="card p-2" method="post" action="">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-secondary" name="order_registration">Заказать</button>
+      </form>
+      {% else %}
+      <span class="text-muted">Войдите для оформления заказа</span>
+      {% endif %}
+    {% endif %}
+    </div>
+  </div>
+
+</div>
+
+
+{% endblock %}

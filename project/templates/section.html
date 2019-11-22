@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Просто магазин / {{ current_section }}{% endblock %}
+
+{% block main %}
+<main role="main">
+
+  <div class="container">
+    <h1>{{ current_section }}</h1>
+    
+    <div class="row">
+
+        {% if product_list %}
+        
+            {% for product in product_list %}         
+
+                  <div class="col-md-4">
+                      <h3>{{ product.title }}</h3>
+                      <a href="{% url 'product' product.pk %}">
+                        <img src="{% static 'img/' %}{{ product.picture }}" width="180">
+                      </a>
+                      <form method="POST" action="">{% csrf_token %}
+                        <input type="hidden" name="add_to_cart" value="{{ product.pk }}">
+                        <input type="submit" class="btn btn-secondary" value="Добавить в корзину »">
+                      </form>
+                  </div> 
+             {% endfor %}
+
+          {% else %}
+            <div class="alert alert-dark" role="alert">
+              Тут пока ничего нет!
+            </div>
+          {% endif %}  
+
+      
+     
+    </div>
+    </div>
+</main>
+{% endblock %}

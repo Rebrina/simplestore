@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Просто магазин / {{ current_section }}{% endblock %}
+
+{% block main %}
+<main role="main">
+
+    <div class="container mt-3">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>{{ product.title }}</h2>
+                <img src="{% static 'img/' %}{{ product.picture }}" width="300">
+                <p>{{ product.description }}</p>
+                <form method="POST" action="">{% csrf_token %}
+                    <input type="hidden" name="add_to_cart" value="{{ product.pk }}">
+                    <input type="submit" class="btn btn-secondary" value="Добавить в корзину »">
+                </form>
+            </div>
+        </div>
+    </div>
+
+</main>
+{% endblock %}

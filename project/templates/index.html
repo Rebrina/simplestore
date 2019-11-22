@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Просто магазин / главная страница{% endblock %}
+
+{% block main %}
+<main role="main">
+
+  {% for article in articles %}
+  <div class="jumbotron">
+    <div class="container">
+      <h1 class="display-4">{{ article.title }}</h1>
+      <p>{{ article.content }}</p>
+    </div>
+  </div>
+
+
+  <div class="container mb-5">
+    <div class="row">
+
+      {% for product in article.products.all %}
+      <div class="col-md-4">
+        <h2>{{ product.title }}</h2>
+        <a href="{% url 'product' product.pk %}">
+          <img src="{% static 'img/' %}{{ product.picture }}" width="180">
+        </a>
+        <form action="" method="POST">{% csrf_token %}
+          <input type="hidden" name="add_to_cart" value="{{ product.pk }}">
+          <input type="submit" class="btn btn-secondary" value="Добавить в корзину »">
+        </form>
+      </div>
+
+      {% endfor %}
+    </div>
+  </div>
+
+  {% endfor %}
+
+</main>
+{% endblock %}
