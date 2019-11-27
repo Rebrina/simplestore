@@ -5,9 +5,13 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.views import LogoutView
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.views.generic import TemplateView, ListView, DetailView
+from django.views.generic import TemplateView, ListView, DetailView, CreateView
+from django import forms
+#from django.http import HttpResponseRedirect
 
-from .models import Category, Section, Product, Article, User
+
+from .forms import ReviewForm
+from .models import Category, Section, Product, Review, Article, Order, OrderLine, User
 
 
 def add_to_cart(request):
@@ -22,7 +26,6 @@ def add_to_cart(request):
 
 
 class MenuMixin:
-
     @staticmethod
     def add_menu_data(context, session):
         context['categories'] = Category.objects.all()
@@ -79,6 +82,7 @@ class StoreLogoutView(LogoutView):
 class SectionView(ListView, MenuMixin):
     template_name = 'section.html'
     model = Product
+    paginate_by = 1
 
     def get_queryset(self):
         return Product.objects.filter(section=self.kwargs['pk'])
@@ -94,17 +98,24 @@ class SectionView(ListView, MenuMixin):
         return super().get(self, request, *args, **kwargs)
 
 
-class ProductView(DetailView, MenuMixin):
+class ProductView(DetailView, MenuMixin, CreateView):
     template_name = 'product.html'
     model = Product
+    context_object_name = 'product'
+    form_class = ReviewForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context = self.add_menu_data(context, self.request.session)
+        form = ReviewForm(initial={ 'product': self.object })
+        form.fields['product'].widget = forms.HiddenInput()
+        context['form'] = form 
         return context
-
+        
     def post(self, request, *args, **kwargs):
         add_to_cart(request)
+        CreateView.post(self, request, *args, **kwargs)
+        #return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         return super().get(self, request, *args, **kwargs)
 
 
@@ -137,3 +148,20 @@ class CartView(TemplateView, MenuMixin):
         order.save()
         self.request.session['just_store_cart'].clear()
         return HttpResponseRedirect(reverse('order'))
+
+
+class OrderView(ListView, MenuMixin):
+    template_name = 'order.html'
+    model = Order
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context = self.add_menu_data(context, self.request.session)
+        if self.request.user.is_authenticated:
+            self.request.session.setdefault('new_order', False)
+            if self.request.session['new_order']:
+                context['is_new_order'] = True
+                self.request.session['new_order'] = False
+            context['orders'] = Order.objects.filter(user=self.request.user).prefetch_related('products').order_by("-pk")
+        context['show_money_count'] = self.request.user.show_money_count
+        return context

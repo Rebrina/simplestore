@@ -22,7 +22,7 @@
       <div class="col-md-4">
         <h2>{{ product.title }}</h2>
         <a href="{% url 'product' product.pk %}">
-          <img src="{% static 'img/' %}{{ product.picture }}" width="180">
+          <img src="{{ product.picture.url }}" width="180">
         </a>
         <form action="" method="POST">{% csrf_token %}
           <input type="hidden" name="add_to_cart" value="{{ product.pk }}">

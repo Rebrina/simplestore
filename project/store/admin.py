@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import User, Category, Section, Product, Article
+from .models import User, Category, Section, Product, Article, Order
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -24,6 +24,10 @@ class ArticleAdmin(admin.ModelAdmin):
     pass
 
 
+class OrderAdmin(admin.ModelAdmin):
+    pass
+
+
 admin.site.register(User, UserAdmin)
 
 admin.site.register(Category, CategoryAdmin)
@@ -33,3 +37,5 @@ admin.site.register(Section, SectionAdmin)
 admin.site.register(Product, ProductAdmin)
 
 admin.site.register(Article, ArticleAdmin)
+
+admin.site.register(Order, OrderAdmin)
